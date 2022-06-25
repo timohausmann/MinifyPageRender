@@ -7,7 +7,7 @@ class MinifyPageRender extends WireData implements Module {
     public static function getModuleInfo() {
         return array(
             'title' => 'Minify Page Render',
-            'summary' => 'This module hooks after Page::render and runs a simple minification. Quote from the minify function author: "This code removes redundant empty spaces. Also it plays it safe and does not remove anything that could potentially break HTML, JS or CSS."',
+            'summary' => 'This module hooks into Page::render and compresses the frontend HTML. Quote from the minify function author: "This code removes redundant empty spaces. Also it plays it safe and does not remove anything that could potentially break HTML, JS or CSS."',
             'author' => 'Timo Hausmann',
             'version' => '100',
             'autoload' => 'template!=admin',
