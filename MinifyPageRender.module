@@ -1,0 +1,69 @@
+<?php
+
+namespace ProcessWire;
+
+class MinifyPageRender extends WireData implements Module {
+
+    public static function getModuleInfo() {
+        return array(
+            'title' => 'Minify Page Render',
+            'summary' => 'This module hooks after Page::render and runs a simple minification. Quote from the minify function author: "This code removes redundant empty spaces. Also it plays it safe and does not remove anything that could potentially break HTML, JS or CSS."',
+            'author' => 'Timo Hausmann',
+            'version' => '100',
+            'autoload' => 'template!=admin',
+            'requires' => 'ProcessWire>=300',
+            'icon'     => 'compress'
+        );
+    }
+
+    /**
+     * Initialize the module
+     *
+     */
+    public function init() {
+        $this->wire()->addHookAfter('Page::render', function(HookEvent $event) {
+            $event->return = $this->minify($event->return);
+        });
+    }
+
+    /**
+     * A simple regex minifier for HTML. 
+     * Based on https://stackoverflow.com/a/29363569/860205
+     * Probably more robust libs, but also more complex to implement:
+     * - https://github.com/hexydec/htmldoc
+     * - https://github.com/mrclay/minify
+     * - https://github.com/jenstornell/tiny-html-minifier
+     */
+    private function minify($body) {
+
+        //remove redundant (white-space) characters
+        $replace = array(
+            //remove tabs before and after HTML tags
+            '/\>[^\S ]+/s'   => '>',
+            '/[^\S ]+\</s'   => '<',
+            //shorten multiple whitespace sequences; keep new-line characters because they matter in JS!!!
+            '/([\t ])+/s'  => ' ',
+            //remove leading and trailing spaces
+            '/^([\t ])+/m' => '',
+            '/([\t ])+$/m' => '',
+            // remove JS line comments (simple only); do NOT remove lines containing URL (e.g. 'src="http://server.com/"')!!!
+            '~//[a-zA-Z0-9 ]+$~m' => '',
+            //remove empty lines (sequence of line-end and white-space characters)
+            '/[\r\n]+([\t ]?[\r\n]+)+/s'  => "\n",
+            //remove empty lines (between HTML tags); cannot remove just any line-end characters because in inline JS they can matter!
+            '/\>[\r\n\t ]+\</s'    => '><',
+            //remove "empty" lines containing only JS's block end character; join with next line (e.g. "}\n}\n</script>" --> "}}</script>"
+            '/}[\r\n\t ]+/s'  => '}',
+            '/}[\r\n\t ]+,[\r\n\t ]+/s'  => '},',
+            //remove new-line after JS's function or condition start; join with next line
+            '/\)[\r\n\t ]?{[\r\n\t ]+/s'  => '){',
+            '/,[\r\n\t ]?{[\r\n\t ]+/s'  => ',{',
+            //remove new-line after JS's line end (only most obvious and safe cases)
+            '/\),[\r\n\t ]+/s'  => '),',
+            //remove quotes from HTML attributes that does not contain spaces; keep quotes around URLs!
+            '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4', //$1 and $4 insert first white-space character found before/after attribute
+        );
+
+        return preg_replace(array_keys($replace), array_values($replace), $body);
+    }
+}
