@@ -19,7 +19,7 @@ Quote from the author:
 
 ## Screenshot
 
-![Alt text](/screenshot.png?raw=true "Screenshot of removed whitespace")
+![Alt text](https://raw.githubusercontent.com/timohausmann/MinifyPageRender/main/screenshot.png "Screenshot of removed whitespace")
 
 ## Changelog
 
