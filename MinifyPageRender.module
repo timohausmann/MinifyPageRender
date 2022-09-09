@@ -9,7 +9,7 @@ class MinifyPageRender extends WireData implements Module {
             'title' => 'Minify Page Render',
             'summary' => 'This module hooks into Page::render and compresses the frontend HTML. Quote from the minify function author: "This code removes redundant empty spaces. Also it plays it safe and does not remove anything that could potentially break HTML, JS or CSS."',
             'author' => 'Timo Hausmann',
-            'version' => '100',
+            'version' => '101',
             'autoload' => 'template!=admin',
             'requires' => 'ProcessWire>=300',
             'icon'     => 'compress'
@@ -59,7 +59,8 @@ class MinifyPageRender extends WireData implements Module {
             '/\)[\r\n\t ]?{[\r\n\t ]+/s'  => '){',
             '/,[\r\n\t ]?{[\r\n\t ]+/s'  => ',{',
             //remove new-line after JS's line end (only most obvious and safe cases)
-            '/\),[\r\n\t ]+/s'  => '),',
+            //this breaks whitespace in "(CEO), 2015"
+            // '/\),[\r\n\t ]+/s'  => '),',
             //remove quotes from HTML attributes that does not contain spaces; keep quotes around URLs!
             '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4', //$1 and $4 insert first white-space character found before/after attribute
         );

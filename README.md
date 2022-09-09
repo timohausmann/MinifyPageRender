@@ -20,3 +20,13 @@ Quote from the author:
 ## Screenshot
 
 ![Alt text](/screenshot.png?raw=true "Screenshot of removed whitespace")
+
+## Changelog
+
+### 1.0.1
+
+* Disabled one rule falsely removing whitespace in the character sequence `), something` like `(CEO), 2015`
+
+### 1.0.0
+
+* Initial release
